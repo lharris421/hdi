@@ -518,7 +518,7 @@ sandwich.var.est.stderr <- function(x,y,betainit,Z){
 
 do.initial.fit <- function(x,y,
                            initial.lasso.method = c("scaled lasso","cv lasso"),
-                           lambda,
+                           lambda=NULL,
                            verbose = FALSE)
 {
   ## Purpose:
@@ -557,7 +557,7 @@ do.initial.fit <- function(x,y,
            },
            "cv lasso"={
              glmnetfit <- cv.glmnet(x=x,y=y)
-             lambda <- glmnetfit$lambda.1se
+             lambda <- glmnetfit$lambda.min
            },
            {
              stop("Not sure what lasso.method you want me to use for the initial fit. The only options for the moment are: 1)scaled lasso 2)cvlasso")
@@ -581,7 +581,7 @@ do.initial.fit <- function(x,y,
       message("Refitting using cross validation: your lambda used all degrees of freedom")
       glmnetfit <- cv.glmnet(x=x,y=y)
       ## setting a lambda here would interpolate solutions, :/
-      lambda <- glmnetfit$lambda.1se
+      lambda <- glmnetfit$lambda.min
     }
 
     intercept <- coef(glmnetfit,s=lambda)[1]
@@ -597,7 +597,7 @@ do.initial.fit <- function(x,y,
        lambda=lambda)
 }
 
-initial.estimator <- function(betainit,x,y,sigma)
+initial.estimator <- function(betainit,x,y,sigma,lambda=NULL)
 {
   ## check if betainit is correctly provided
   if(!((is.numeric(betainit) && length(betainit) == ncol(x)) ||
@@ -610,7 +610,7 @@ initial.estimator <- function(betainit,x,y,sigma)
     warning("Overriding the error variance estimate with your own value. The initial estimate implies an error variance estimate and if they don't correspond the testing might not be correct anymore.") 
   }
 
-  lambda <- NULL
+  # lambda <- NULL
   
   if(is.numeric(betainit))
   {
@@ -629,7 +629,7 @@ initial.estimator <- function(betainit,x,y,sigma)
     }
   }else{
     initial.fit <- do.initial.fit(x=x,y=y,
-                                  initial.lasso.method=betainit)
+                                  initial.lasso.method=betainit,lambda=lambda)
     beta.lasso <- initial.fit$betalasso
 
     lambda <- initial.fit$lambda
