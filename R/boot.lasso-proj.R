@@ -81,7 +81,6 @@ boot.lasso.proj <- function(x, y, family = "gaussian",
   ###################################
   
   ## Initial Lasso estimate
-  print(lambda)
   initial.estimate <- initial.estimator(betainit = betainit, sigma = sigma,
                                         x = x, y = y, lambda = lambda)
   betalasso <- initial.estimate$beta.lasso
@@ -116,7 +115,6 @@ boot.lasso.proj <- function(x, y, family = "gaussian",
   lambda <- NULL
   if (boot.shortcut)
     lambda <- initial.estimate$lambda
-    print(lambda)
 
   ## ?ISSUE?:
   ## If the user provided his own betainit, we have no lambda value
@@ -182,15 +180,8 @@ boot.lasso.proj <- function(x, y, family = "gaussian",
   }
   
   ## Compute p-values based on that distribution
-  # print("bproj")
-  # print(bproj)
-  # print("se")
-  # print(se)
-  # print("cboot.dist")
-  # print(cboot.dist)
   
   dist <- bproj/se - cboot.dist
-  print(dist)
   counts <- apply(dist >=0,1,sum)
   if(any(counts >= B/2))
     counts[counts >= B/2] <- B-counts[counts >= B/2]
