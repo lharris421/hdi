@@ -10,7 +10,8 @@ lasso.proj <- function(x, y, family = "gaussian",
                        return.Z = FALSE,
                        suppress.grouptesting = FALSE,
                        robust = FALSE,
-                       do.ZnZ = FALSE)
+                       do.ZnZ = FALSE,
+                       lambda = NULL)
 {
   ## Purpose:
   ## An implementation of the LDPE method http://arxiv.org/abs/1110.2563
@@ -71,7 +72,7 @@ lasso.proj <- function(x, y, family = "gaussian",
   
   ## Initial Lasso estimate
   initial.estimate <- initial.estimator(betainit = betainit, sigma = sigma,
-                                        x = x, y = y)
+                                        x = x, y = y, lambda = lambda)
   betalasso <- initial.estimate$beta.lasso
   sigmahat <- initial.estimate$sigmahat
 
@@ -113,8 +114,11 @@ lasso.proj <- function(x, y, family = "gaussian",
              p.adjust.wy(cov = cov2, pval = pval, N = N)
            } else if(multiplecorr.method %in% p.adjust.methods) {
              p.adjust(pval,method = multiplecorr.method)
-           } else
-             stop("Unknown multiple correction method specified")
+           } else if (multiplecorr.method == "none") {
+             pval
+           } else {
+             stop("Unknown multiple correction method specified") 
+           }
 
 
   ##############################################
@@ -156,7 +160,8 @@ lasso.proj <- function(x, y, family = "gaussian",
               betahat     = betalasso / sds,
               family      = family,
               method      = "lasso.proj",
-              call        = match.call())
+              call        = match.call(),
+              lambda      = lambda)
   if(return.Z)
     out <- c(out,
              list(Z = scale(Z,center=FALSE,scale=1/scaleZ)))##unrescale the Zs
