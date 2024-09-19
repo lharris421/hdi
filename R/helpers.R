@@ -557,7 +557,7 @@ do.initial.fit <- function(x,y,
            },
            "cv lasso"={
              glmnetfit <- cv.glmnet(x=x,y=y)
-             lambda <- glmnetfit$lambda.min
+             lambda <- glmnetfit$lambda.1se
            },
            {
              stop("Not sure what lasso.method you want me to use for the initial fit. The only options for the moment are: 1)scaled lasso 2)cvlasso")
@@ -581,7 +581,7 @@ do.initial.fit <- function(x,y,
       message("Refitting using cross validation: your lambda used all degrees of freedom")
       glmnetfit <- cv.glmnet(x=x,y=y)
       ## setting a lambda here would interpolate solutions, :/
-      lambda <- glmnetfit$lambda.min
+      lambda <- glmnetfit$lambda.1se
     }
 
     intercept <- coef(glmnetfit,s=lambda)[1]
@@ -609,8 +609,6 @@ initial.estimator <- function(betainit,x,y,sigma,lambda=NULL)
   warning.sigma.message <- function() {
     warning("Overriding the error variance estimate with your own value. The initial estimate implies an error variance estimate and if they don't correspond the testing might not be correct anymore.") 
   }
-
-  # lambda <- NULL
   
   if(is.numeric(betainit))
   {
